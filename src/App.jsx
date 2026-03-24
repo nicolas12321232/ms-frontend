@@ -23,7 +23,7 @@ function App() {
           <SelectorHorario horario={horario} setHorario={setHorario} />
         )}
 
-        {/* 3. Reemplazamos el mensaje verde por el componente de Canchas */}
+        
         {deporte && horario && (
           <ListaCanchas 
             deporte={deporte} 
