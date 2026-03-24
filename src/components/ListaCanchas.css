@@ -1,0 +1,84 @@
+.canchas-container {
+  margin-top: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.canchas-container h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.grid-canchas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.tarjeta-cancha {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: #fafafa;
+}
+
+.tarjeta-cancha:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.tarjeta-cancha.seleccionada {
+  border: 2px solid #27ae60;
+  background-color: #f0fdf4;
+}
+
+.img-cancha {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.info-cancha {
+  padding: 15px;
+}
+
+.info-cancha h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.tipo {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.precio {
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.btn-reservar {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-reservar:hover {
+  background-color: #2980b9;
+}
+
+.tarjeta-cancha.seleccionada .btn-reservar {
+  background-color: #27ae60;
+}

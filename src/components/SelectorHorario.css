@@ -1,0 +1,40 @@
+/* src/components/SelectorHorario.css */
+.horario-container {
+  margin-top: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.horario-container h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.botones-horario {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap; /* Si la pantalla es pequeña, se van a la línea de abajo */
+}
+
+.btn-hora {
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hora:hover {
+  border-color: #f39c12;
+}
+
+.btn-hora.activo {
+  background-color: #fef5e7;
+  border-color: #f39c12;
+  color: #d35400;
+  font-weight: bold;
+}
