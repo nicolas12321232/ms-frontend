@@ -1,20 +1,32 @@
-
 import './Navbar.css'; 
 
-function Navbar() {
+
+function Navbar({ setVistaActual }) {
   return (
     <nav className="navbar">
       <div className="logo">
-        <h2>⚽ CanchaConnect</h2>
+      
+        <h2 style={{cursor: 'pointer'}} onClick={() => setVistaActual('reservar')}>
+          ⚽ CanchaConnect
+        </h2>
       </div>
       <div className="enlaces">
-        <a href="#reservas">Mis Reservas</a>
-        <a href="#canchas">Canchas</a>
-        <a href="#canchas">Calendario</a>
+       
+        <a href="#reservas" onClick={(e) => { e.preventDefault(); setVistaActual('mis-reservas'); }}>
+          Mis Reservas
+        </a>
+        
+      
+        <a href="#canchas" onClick={(e) => { e.preventDefault(); setVistaActual('reservar'); }}>
+          Canchas
+        </a>
+        
+       
+        <a href="#calendario" onClick={(e) => e.preventDefault()}>Calendario</a>
         <button className="btn-login">Iniciar Sesión</button>
       </div>
     </nav>
   );
 }
 
-export default Navbar; 
+export default Navbar;
