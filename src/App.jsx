@@ -46,6 +46,30 @@ function App() {
     setVistaActual("mis-reservas");
   };
 
+  const editarPrecioCancha = (id, nuevoPrecio) => {
+    const canchasActualizadas = listaCanchas.map(cancha => {
+      if (cancha.id === id) {
+        return { ...cancha, precio: nuevoPrecio }; 
+      }
+      return cancha;
+    });
+    setListaCanchas(canchasActualizadas);
+  };
+
+ 
+  const alternarEstadoCancha = (id) => {
+    const canchasActualizadas = listaCanchas.map(cancha => {
+      if (cancha.id === id) {
+        
+        const estadoActual = cancha.activa !== undefined ? cancha.activa : true;
+        return { ...cancha, activa: !estadoActual }; 
+      }
+      return cancha;
+    });
+    setListaCanchas(canchasActualizadas);
+  };
+
+  const canchasActivas = listaCanchas.filter(cancha => cancha.activa !== false);
   return (
     <div className="app-container">
       <Navbar setVistaActual={setVistaActual} />
@@ -77,14 +101,17 @@ function App() {
        
         {vistaActual === "catalogo" && (
           <CatalogoCanchas 
-            listaCanchas={listaCanchas} 
+          listaCanchas={listaCanchas} 
             eliminarCancha={eliminarCancha} 
             agregarCancha={agregarCancha}
+            alternarEstado={alternarEstadoCancha}
+            editarPrecio={editarPrecioCancha}
+            
           />
         )}
 
         {vistaActual === "calendario" && (
-          <Calendario listaCanchas={listaCanchas} />
+         <Calendario listaCanchas={canchasActivas} />
         )}
 
       </main>
