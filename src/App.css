@@ -1,0 +1,22 @@
+.app-container {
+  text-align: center;
+  padding: 50px;
+}
+
+h1 {
+  color: #2c3e50;
+  font-size: 3rem;
+}
+
+.slot-libre:hover {
+  background-color: #1abc9c !important;
+  color: white !important;
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(26, 188, 156, 0.4);
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
