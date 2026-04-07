@@ -10,66 +10,37 @@ import Calendario from "./components/Calendario";
 import "./App.css";
 
 function App() {
-  
+
   const [vistaActual, setVistaActual] = useState("reservar");
   const [deporte, setDeporte] = useState("");
-  const [horario, setHorario] = useState("");
   const [cancha, setCancha] = useState(null);
+  const [horarios, setHorarios] = useState([]);
 
- 
-  const [listaCanchas, setListaCanchas] = useState([
-    { id: 1, nombre: 'Cancha Los Pinos', deporte: 'futbol', tipo: 'Sintética 5v5', precio: 50000, imagen: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&q=80&w=400' },
-    { id: 2, nombre: 'El Campín Pequeño', deporte: 'futbol', tipo: 'Grama natural 11v11', precio: 120000, imagen: 'https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&q=80&w=400' },
-    { id: 3, nombre: 'Arena Vóley Sur', deporte: 'voley', tipo: 'Arena', precio: 40000, imagen: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&q=80&w=400' },
-    { id: 4, nombre: 'Coliseo Techado', deporte: 'voley', tipo: 'Maderamen', precio: 60000, imagen: 'https://images.unsplash.com/photo-1552667466-07770ae110d0?auto=format&fit=crop&q=80&w=400' },
-  ]);
-
-
-  const eliminarCancha = (idABorrar) => {
-   
-    const nuevaLista = listaCanchas.filter(cancha => cancha.id !== idABorrar);
-    setListaCanchas(nuevaLista);
+  const manejarCambioDeporte = (nuevoDeporte) => {
+    setDeporte(nuevoDeporte);
+    setCancha(null);
+    setHorarios([]); 
   };
 
-  const agregarCancha = (nuevaCancha) => {
-    
-    const nuevoId = listaCanchas.length > 0 ? Math.max(...listaCanchas.map(c => c.id)) + 1 : 1;
-    const canchaConId = { ...nuevaCancha, id: nuevoId };
-    
-    
-    setListaCanchas([...listaCanchas, canchaConId]);
+  const manejarCambioCancha = (nuevaCancha) => {
+    setCancha(nuevaCancha);
+    setHorarios([]); 
   };
 
+  // 3. Lógica de confirmación (Se ejecuta cuando ConfirmacionReserva.jsx termina de guardar en la BD)
   const manejarConfirmacion = () => {
-    alert(`¡Éxito! Tu reserva para ${cancha.nombre} a las ${horario} ha sido confirmada.`);
-    setDeporte(""); setHorario(""); setCancha(null);
+    // CORRECCIÓN 1: Usar horarios.join(", ") para que muestre "19:00, 20:00" en la alerta
+    alert(`¡Éxito! Tu reserva para ${cancha.nombre} a las ${horarios.join(", ")} ha sido confirmada.`);
+    
+    // CORRECCIÓN 2: Limpiar usando setHorarios([]) con arreglo vacío
+    setDeporte(""); 
+    setHorarios([]); 
+    setCancha(null);
+    
+    // Redirigimos a mis reservas
     setVistaActual("mis-reservas");
   };
 
-  const editarPrecioCancha = (id, nuevoPrecio) => {
-    const canchasActualizadas = listaCanchas.map(cancha => {
-      if (cancha.id === id) {
-        return { ...cancha, precio: nuevoPrecio }; 
-      }
-      return cancha;
-    });
-    setListaCanchas(canchasActualizadas);
-  };
-
- 
-  const alternarEstadoCancha = (id) => {
-    const canchasActualizadas = listaCanchas.map(cancha => {
-      if (cancha.id === id) {
-        
-        const estadoActual = cancha.activa !== undefined ? cancha.activa : true;
-        return { ...cancha, activa: !estadoActual }; 
-      }
-      return cancha;
-    });
-    setListaCanchas(canchasActualizadas);
-  };
-
-  const canchasActivas = listaCanchas.filter(cancha => cancha.activa !== false);
   return (
     <div className="app-container">
       <Navbar setVistaActual={setVistaActual} />
@@ -79,39 +50,48 @@ function App() {
         {vistaActual === "reservar" && (
           <>
             <h1>Reserva tu Cancha</h1>
-            <SelectorDeporte deporte={deporte} setDeporte={setDeporte} />
-            {deporte && <SelectorHorario horario={horario} setHorario={setHorario} />}
-            {deporte && horario && (
+            
+            {/* PASO 1: DEPORTE */}
+            <SelectorDeporte deporte={deporte} setDeporte={manejarCambioDeporte} />
+            
+            {/* PASO 2: CANCHA (Aparece solo si ya hay un deporte) */}
+            {deporte && (
               <ListaCanchas
                 deporte={deporte}
-                horario={horario}
                 canchaSeleccionada={cancha}
-                setCancha={setCancha}
-                canchasTotales={listaCanchas} 
+                setCancha={manejarCambioCancha}
               />
             )}
+            
+            {/* PASO 3: HORARIO (Aparece solo si ya hay una cancha elegida) */}
             {cancha && (
-              <ConfirmacionReserva deporte={deporte} horario={horario} cancha={cancha} alConfirmar={manejarConfirmacion} />
+              <SelectorHorario 
+                cancha={cancha} 
+                horarios={horarios} 
+                setHorarios={setHorarios} 
+              />
+            )}
+            
+            {/* PASO 4: CONFIRMACIÓN (Aparece al tener cancha y al menos un horario seleccionado) */}
+            {cancha && horarios.length > 0 && (
+              <ConfirmacionReserva 
+                deporte={deporte} 
+                horarios={horarios} 
+                cancha={cancha} 
+                alConfirmar={manejarConfirmacion} 
+              />
             )}
           </>
         )}
 
         {vistaActual === "mis-reservas" && <MisReservas />}
 
-       
         {vistaActual === "catalogo" && (
-          <CatalogoCanchas 
-          listaCanchas={listaCanchas} 
-            eliminarCancha={eliminarCancha} 
-            agregarCancha={agregarCancha}
-            alternarEstado={alternarEstadoCancha}
-            editarPrecio={editarPrecioCancha}
-            
-          />
+          <CatalogoCanchas />
         )}
 
         {vistaActual === "calendario" && (
-         <Calendario listaCanchas={canchasActivas} />
+          <Calendario />
         )}
 
       </main>
