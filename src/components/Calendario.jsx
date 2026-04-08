@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 
-// Ya no recibimos listaCanchas por props
 function Calendario() {
   const [fechaActual, setFechaActual] = useState(new Date());
   const obtenerFechaStr = (fecha) => fecha.toISOString().split('T')[0];
   const fechaActualStr = obtenerFechaStr(fechaActual);
 
-  // 1. Nuevos estados para manejar datos del Backend
+  // 1. Estados para manejar datos del Backend
   const [listaCanchas, setListaCanchas] = useState([]);
   const [eventos, setEventos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -14,7 +13,12 @@ function Calendario() {
   const [slotSeleccionado, setSlotSeleccionado] = useState(null); 
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null); 
 
-  const horas = ['08:00', '09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+  // Ajustado para coincidir con el horario de apertura (09:00) y cierre (23:00)
+  const horas = [
+    '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+    '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', 
+    '21:00', '22:00' // El bloque de las 22:00 termina a las 23:00
+  ];
 
   // 2. useEffect para traer las Canchas Activas
   useEffect(() => {
@@ -23,8 +27,8 @@ function Calendario() {
         const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/canchas`);
         if (respuesta.ok) {
           const datos = await respuesta.json();
-          // Filtramos solo las activas
-          setListaCanchas(datos.filter(c => c.activa !== false));
+          // Filtramos usando el campo 'estado' de tu Java (DISPONIBLE o ACTIVO)
+          setListaCanchas(datos.filter(c => c.estado === 'DISPONIBLE' || c.estado === 'ACTIVO'));
         }
       } catch (error) {
         console.error("Error cargando canchas en calendario:", error);
@@ -38,7 +42,6 @@ function Calendario() {
     const cargarReservas = async () => {
       setCargando(true);
       try {
-        // En el futuro, Spring Boot debería tener este endpoint:
         const url = `${import.meta.env.VITE_API_URL}/reservas/fecha/${fechaActualStr}`;
         const respuesta = await fetch(url);
         
@@ -70,10 +73,10 @@ function Calendario() {
   const fechaTexto = fechaActual.toLocaleDateString('es-ES', opcionesFecha);
 
   const obtenerEvento = (canchaId, hora) => {
-    // Adaptado para leer cancha.id si viene anidado de Spring Boot o localmente
     return eventos.find(e => 
       (e.canchaId === canchaId || (e.cancha && e.cancha.id === canchaId)) && 
-      e.hora === hora && 
+      // Compara la hora ignorando los segundos si el backend los envía (ej. 09:00 vs 09:00:00)
+      e.hora.substring(0, 5) === hora && 
       e.fecha === fechaActualStr
     );
   };
@@ -95,10 +98,11 @@ function Calendario() {
 
     const nuevoEvento = {
       fecha: fechaActualStr,
-      hora: slotSeleccionado.hora,
+      // Le agregamos ":00" a la hora para que Spring Boot (LocalTime) no falle
+      hora: slotSeleccionado.hora.length === 5 ? `${slotSeleccionado.hora}:00` : slotSeleccionado.hora,
       tipo: tipoEvento, 
       titulo: titulo,
-      cancha: { id: slotSeleccionado.cancha.id } // Formato Spring Boot
+      cancha: { id: slotSeleccionado.cancha.id } 
     };
     
     try {
@@ -111,12 +115,12 @@ function Calendario() {
 
       if (respuesta.ok) {
         const eventoGuardado = await respuesta.json();
-        setEventos([...eventos, eventoGuardado]); // Actualiza UI con el ID real de la BD
+        setEventos([...eventos, eventoGuardado]); 
       } else {
         throw new Error("Fallo en backend");
       }
     } catch (error) {
-      console.log("Guardado local (Backend no disponible):", error);
+      console.log("Guardado local (Backend no disponible o con error):", error);
       // Fallback local
       setEventos([...eventos, { ...nuevoEvento, id: Date.now(), canchaId: slotSeleccionado.cancha.id }]);
     }
@@ -183,7 +187,6 @@ function Calendario() {
                 <th key={cancha.id} style={estilos.thCancha}>
                   <div style={{ fontSize: '1.1rem', marginBottom: '4px' }}>{cancha.nombre}</div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 'normal', opacity: 0.8 }}>
-                     {/* Mostramos el nombre del deporte que viene de la BD */}
                      {cancha.deporte ? cancha.deporte.nombre : 'Deporte'}
                   </div>
                 </th>
